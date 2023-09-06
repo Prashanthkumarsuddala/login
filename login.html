@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prashanth's Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #c3ecbe;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            color: #000000;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        form {
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #94d3ec;
+            border: 1px solid #0c0000;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(10, 9, 9, 0.2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #040303;
+            border-radius: 3px;
+        }
+
+        button[type="submit"] {
+            background-color: #03a320;
+            color: #ffffff;
+            border: 1px solid #0c0000;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #3e3f8b;
+        }
+
+        button {
+            margin-top: 10px;
+            background-color: #821ce8;
+            border: 1px solid #0c0000;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4f2ae1;
+        }
+
+        #usernamePuzzle,
+        #passwordPuzzle,
+        #credentials,
+        #error-message {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #dce659;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .error {
+            color: #ff0000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>To Open Prashanth Kumar's LinkedIn Profile Please login</h2>
+    <h1>Prashanth Login Page</h1>
+
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <button id="forgotUsername">Don't know the username?</button>
+    <button id="forgotPassword">Don't know the password?</button>
+
+    <div id="usernamePuzzle" style="display: none;">
+        <p>Solve the puzzle to reveal the username:</p>
+        <span id="usernamePuzzleText"></span>
+        <input type="number" id="usernamePuzzleSolution" required>
+        <button id="checkUsernameSolution">Check</button>
+        <button id="copyUsername">Copy Username</button>
+    </div>
+
+    <div id="passwordPuzzle" style="display: none;">
+        <p>Solve the puzzle to reveal the password:</p>
+        <span id="passwordPuzzleText"></span>
+        <input type="number" id="passwordPuzzleSolution" required>
+        <button id="checkPasswordSolution">Check</button>
+        <button id="copyPassword">Copy Password</button>
+    </div>
+
+    <div id="credentials" style="display: none;">
+        <p>Username: <span id="usernameDisplay"></span></p>
+        <button id="copyUsernameCredentials">Copy Username</button><br>
+        <p>Password: <span id="passwordDisplay"></span></p>
+        <button id="copyPasswordCredentials">Copy Password</button>
+    </div>
+
+    <div id="error-message" style="display: none;">
+        <p class="error" id="errorMessage"></p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById("loginForm");
+            const forgotUsernameButton = document.getElementById("forgotUsername");
+            const forgotPasswordButton = document.getElementById("forgotPassword");
+            const usernamePuzzle = document.getElementById("usernamePuzzle");
+            const usernamePuzzleText = document.getElementById("usernamePuzzleText");
+            const usernamePuzzleSolutionInput = document.getElementById("usernamePuzzleSolution");
+            const checkUsernameSolutionButton = document.getElementById("checkUsernameSolution");
+            const copyUsernameButton = document.getElementById("copyUsername");
+            const passwordPuzzle = document.getElementById("passwordPuzzle");
+            const passwordPuzzleText = document.getElementById("passwordPuzzleText");
+            const passwordPuzzleSolutionInput = document.getElementById("passwordPuzzleSolution");
+            const checkPasswordSolutionButton = document.getElementById("checkPasswordSolution");
+            const copyPasswordButton = document.getElementById("copyPassword");
+            const credentials = document.getElementById("credentials");
+            const usernameDisplay = document.getElementById("usernameDisplay");
+            const passwordDisplay = document.getElementById("passwordDisplay");
+            const copyUsernameCredentialsButton = document.getElementById("copyUsernameCredentials");
+            const copyPasswordCredentialsButton = document.getElementById("copyPasswordCredentials");
+            const errorMessage = document.getElementById("errorMessage");
+            const errorMessageBox = document.getElementById("error-message");
+
+            // Hardcoded correct username and password
+            const correctUsername = "prashanthkumar";
+            const correctPassword = "12345";
+
+            // Event listener for "Don't know the username" button
+            forgotUsernameButton.addEventListener("click", function () {
+                generateRandomPuzzle(usernamePuzzleText);
+                usernamePuzzle.style.display = "block";
+                errorMessageBox.style.display = "none"; // Hide error message
+            });
+
+            // Event listener for "Don't know the password" button
+            forgotPasswordButton.addEventListener("click", function () {
+                generateRandomPuzzle(passwordPuzzleText);
+                passwordPuzzle.style.display = "block";
+                errorMessageBox.style.display = "none"; // Hide error message
+            });
+
+            // Event listener for checking the username puzzle solution
+            checkUsernameSolutionButton.addEventListener("click", function () {
+                const expectedSolution = calculateExpectedSolution(usernamePuzzleText.textContent);
+                checkSolution(parseInt(usernamePuzzleSolutionInput.value), expectedSolution, usernameDisplay, correctUsername);
+            });
+
+            // Event listener for checking the password puzzle solution
+            checkPasswordSolutionButton.addEventListener("click", function () {
+                const expectedSolution = calculateExpectedSolution(passwordPuzzleText.textContent);
+                checkSolution(parseInt(passwordPuzzleSolutionInput.value), expectedSolution, passwordDisplay, correctPassword);
+            });
+
+            // Event listener for copying the username
+            copyUsernameButton.addEventListener("click", function () {
+                copyTextToClipboard(usernameDisplay.textContent);
+            });
+
+            // Event listener for copying the password
+            copyPasswordButton.addEventListener("click", function () {
+                copyTextToClipboard(passwordDisplay.textContent);
+            });
+
+            // Event listener for copying the username credentials
+            copyUsernameCredentialsButton.addEventListener("click", function () {
+                copyTextToClipboard(usernameDisplay.textContent);
+            });
+
+            // Event listener for copying the password credentials
+            copyPasswordCredentialsButton.addEventListener("click", function () {
+                copyTextToClipboard(passwordDisplay.textContent);
+            });
+
+            // Function to generate a random puzzle
+            function generateRandomPuzzle(puzzleElement) {
+                const firstNumber = Math.floor(Math.random() * 10);
+                const secondNumber = Math.floor(Math.random() * 10);
+                const operator = getRandomOperator();
+                puzzleElement.textContent = `${firstNumber} ${operator} ${secondNumber} is`;
+            }
+
+            // Function to get a random operator
+            function getRandomOperator() {
+                const operators = ["+", "-", "*", "/"];
+                const randomIndex = Math.floor(Math.random() * operators.length);
+                return operators[randomIndex];
+            }
+
+            // Function to calculate the expected solution
+            function calculateExpectedSolution(puzzleText) {
+                const [firstNumber, operator, secondNumber] = puzzleText.split(" ");
+                switch (operator) {
+                    case "+":
+                        return parseInt(firstNumber) + parseInt(secondNumber);
+                    case "-":
+                        return parseInt(firstNumber) - parseInt(secondNumber);
+                    case "*":
+                        return parseInt(firstNumber) * parseInt(secondNumber);
+                    case "/":
+                        return parseInt(firstNumber) / parseInt(secondNumber);
+                    default:
+                        return 0;
+                }
+            }
+
+            // Function to check the solution and reveal the result
+            function checkSolution(solution, expectedSolution, displayElement, result) {
+                if (solution === expectedSolution) {
+                    displayElement.textContent = result;
+                    credentials.style.display = "block";
+                    errorMessageBox.style.display = "none"; // Hide error message
+                } else {
+                    errorMessage.textContent = "Incorrect solution. Try again.";
+                    errorMessageBox.style.display = "block"; // Show error message
+                }
+            }
+
+            // Function to copy text to clipboard
+            function copyTextToClipboard(text) {
+                const tempInput = document.createElement("input");
+                tempInput.value = text;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+            }
+
+            // Event listener for the login form submission
+            loginForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                const enteredUsername = document.getElementById("username").value;
+                const enteredPassword = document.getElementById("password").value;
+
+                if (enteredUsername === correctUsername && enteredPassword === correctPassword) {
+                    // Redirect to the specified website after submitting the form
+                    window.location.href = "https://www.linkedin.com/in/prashanth-kumar-suddala-39a53022a";
+                } else {
+                    // Show an error message for incorrect credentials
+                    errorMessage.textContent = "Incorrect username or password. Try again.";
+                    errorMessageBox.style.display = "block"; // Show error message
+                }
+            });
+        });
+    </script>
+</body>
+</html>
